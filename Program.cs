@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PublishSubscribeBroker.Networking;
+using System;
 using System.Net;
 
 namespace PublishSubscribeBroker
@@ -7,24 +8,33 @@ namespace PublishSubscribeBroker
     // Main entry point to start the publish-subscribe broker
     class Program
     {
-        private static BrokerServer server; // The active broker server
+        private static BrokerServer server;     // The active broker server
 
         static void Main(string[] args)
         {
             Logger.Info("Starting Publish-Subscribe Broker...");
 
-            // Start the broker server
-            StartBroker("127.0.0.1", 8008);
-
-            if (server.IsStarted())
+            try
             {
+                // Start the broker server
+                StartBroker("127.0.0.1", 8008);
+
                 Logger.Info("Broker server started");
-
-                // TODO
             }
-            else
+            catch (Exception e) {
+                Logger.Error("Broker server failed to start" + Environment.NewLine + e.Message);
+            }
+
+            try
             {
-                Logger.Error("Broker server failed to start");
+                // Start a client
+                Client client = new Client("127.0.0.1", 8008);
+
+                Logger.Info("Client started");
+            }
+            catch (Exception e)
+            {
+                Logger.Error("Client failed to start" + Environment.NewLine + e.Message);
             }
 
             // TODO
