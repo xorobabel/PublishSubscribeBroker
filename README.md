@@ -1,2 +1,14 @@
-# PublishSubscribeBroker
-A relatively simple implementation of the publish-subscribe pattern, where publishers can post messages to a topic and subscribers can receive messages for topics they have subscribed to.  Made during Paycom's Summer Engagement Program 2020.
+# Publish-Subscribe Broker
+### Created by Logan Giese
+A relatively simple implementation of a publish-subscribe system in C# over TCP, made during Paycom's Summer Engagement Program 2020.
+
+----
+## Features
+Publishers can:
+* Create a new topic to publish to
+* Publish a message to a topic
+
+Subscribers can:
+* Request and receive a list of active topics
+* Subscribe to or unsubscribe from a topic
+* Receive messages published to subscribed topics
