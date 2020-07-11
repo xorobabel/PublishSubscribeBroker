@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
@@ -7,17 +8,35 @@ using System.Text;
 
 namespace PublishSubscribeBroker.Networking
 {
+    /// <summary>
+    /// Extendable data object containing information about a connected client
+    /// </summary>
+    [Serializable]
+    public class ClientInfo
+    {
+        /// <summary>
+        /// The unique internal ID of the client
+        /// </summary>
+        public Guid ID { get; set; }
+    }
+
     // Server class that can asynchronously connect with clients to send/receive messages
     class Server
     {
-        private TcpListener listener;       // The TCP listener used by the server for communication
-        private List<TcpClient> clients;    // A list of all clients currently connected to the server
+        /// <summary>
+        /// The TCP listener used by the server for communication
+        /// </summary>
+        private TcpListener listener;
+        /// <summary>
+        /// A thread-safe collection of all clients currently connected to the server, organized by unique ID
+        /// </summary>
+        private ConcurrentDictionary<Guid, TcpClient> clients;
 
         // Constructor to build a server with the specified IP and port
         public Server(string ipAddress, int port)
         {
             listener = new TcpListener(IPAddress.Parse(ipAddress), port);
-            clients = new List<TcpClient>();
+            clients = new ConcurrentDictionary<Guid, TcpClient>();
         }
 
         // Start the server and listen for clients
