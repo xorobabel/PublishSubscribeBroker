@@ -3,20 +3,20 @@
 namespace PublishSubscribeBroker
 {
     /// <summary>
-    /// Serializable message object containing information for a published message in a pub/sub system
+    /// Data object containing information for a published message in a pub/sub system
     /// </summary>
     [Serializable]
     public class Message<T>
     {
         /// <summary>
-        /// The name or ID of the message publisher
+        /// The publisher of the message
         /// </summary>
-        public string Publisher { get; set; }
+        public Publisher Publisher { get; set; }
 
         /// <summary>
-        /// The topic where the message was published
+        /// The unique internal ID of the topic the message was published to
         /// </summary>
-        public string Topic { get; set; }
+        public Guid TopicID { get; set; }
 
         /// <summary>
         /// The date and time when the message was published
@@ -24,9 +24,8 @@ namespace PublishSubscribeBroker
         public DateTime Timestamp { get; set; }
 
         /// <summary>
-        /// The content of the message
+        /// The content of the message (must be serializable for sending)
         /// </summary>
         public T Content { get; set; }
-
     }
 }
