@@ -1,40 +1,64 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Net;
 using System.Net.Sockets;
-using System.Text;
+using System.Threading.Tasks;
 
 namespace PublishSubscribeBroker.Networking
 {
-    // Client class that can connect to a server to send/receive messages
+    /// <summary>
+    /// Client class that can connect to a server to send and receive messages
+    /// </summary>
     class Client
     {
-        private TcpClient client;           // The underlying TCP client used to communicate with a server
+        /// <summary>
+        /// The underlying TCP client used to communicate with a server
+        /// </summary>
+        protected TcpClient client;
 
-        // Constructor to build a client and connect to the server at the specified address and port
+        /// <summary>
+        /// Constructor to build a client and connect to the server at the specified address and port
+        /// </summary>
         public Client(string ipAddress, int port)
         {
             client = new TcpClient(ipAddress, port);
-            HandleCommunication();
         }
 
-        // Disconnect from the currently-connected server (if connected)
+        /// <summary>
+        /// Start asynchronously handling communication between the client and the server
+        /// </summary>
+        public void StartClient()
+        {
+            Task.Factory.StartNew(() => HandleCommunication());
+        }
+
+        /// <summary>
+        /// Disconnect from the currently-connected server (if connected)
+        /// </summary>
         public void Disconnect()
         {
             client.Close();
         }
 
-        // Check if the client is currently connected to the server
+        /// <summary>
+        /// Check if the client is currently connected to a server
+        /// </summary>
+        /// <returns>Whether the client is connected or not</returns>
         public bool IsConnected()
         {
             return client.Connected;
         }
 
-        // Defines the communication behavior of the client while connected to the server, using the client's communication stream
+        /// <summary>
+        /// Performs the communication behavior of the client while connected to a server
+        /// <br/><br/>
+        /// This method can be overridden by a subclass to provide a custom communication protocol
+        /// </summary>
         protected virtual void HandleCommunication()
         {
-            // Simple example handler: Get input from the user and send it immediately to the server
+            // Simple example protocol: Get input from the user and send it immediately to the server
             // -----
             NetworkStream clientStream = client.GetStream();
+
             while (IsConnected())
             {
                 // Get a message from the user to send
@@ -45,16 +69,12 @@ namespace PublishSubscribeBroker.Networking
                     Disconnect();
                 else
                 {
-                    // Encode the message and send it to the server
-                    Message message = new Message(Encoding.UTF8.GetBytes(input));
-                    byte[] data = message.Encode();
-                    clientStream.Write(data, 0, data.Length);
+                    // Format the message and send it to the server
+                    byte[] message = new SendableMessage<string>(input).Format();
+                    clientStream.Write(message, 0, message.Length);
                 }
             }
-            clientStream.Dispose();
             // -----
-
-            // NOTE: This function can be overridden by a child class to provide a more specific protocol
         }
 
     }
