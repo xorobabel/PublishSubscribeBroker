@@ -1,34 +1,71 @@
 ﻿using PublishSubscribeBroker.Networking;
 using System;
-using System.Net;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace PublishSubscribeBroker
 {
 
-    // Main entry point to start the publish-subscribe broker
+    // Main entry point to start the publish-subscribe broker test application
     class Program
     {
-        private static BrokerServer server;     // The active broker server
+        private static Server server;           // The active server
+        private static List<Client> clients;    // The active clients
 
         static void Main(string[] args)
         {
-            Logger.Info("Starting Publish-Subscribe Broker...");
+            clients = new List<Client>();
 
+            Logger.Info("Starting Publish-Subscribe Broker test application...");
+
+            // Start the server
+            Task serverTask = Task.Factory.StartNew(() => StartServer("127.0.0.1", 8008));
+            serverTask.Wait();
+
+            // Start a client
+            StartClient("localhost", 8008);
+
+            // Wait for the server to shut down or all clients to disconnect
+            bool clientStillRunning;
+            while (server.IsRunning())
+            {
+                clientStillRunning = false;
+                foreach (Client client in clients)
+                    if (client.IsConnected())
+                        clientStillRunning = true;
+
+                if (!clientStillRunning)
+                {
+                    server.StopServer();
+                    Logger.Info("Server stopped because all clients disconnected");
+                }
+            }
+        }
+
+        // Initialize a new server
+        private static void StartServer(string ipAddress, int port)
+        {
             try
             {
-                // Start the broker server
-                StartBroker("127.0.0.1", 8008);
+                server = new Server(ipAddress, port);
+                server.StartServer();
 
-                Logger.Info("Broker server started");
+                Logger.Info("Server started");
             }
-            catch (Exception e) {
-                Logger.Error("Broker server failed to start" + Environment.NewLine + e.Message);
+            catch (Exception e)
+            {
+                Logger.Error("Server failed to start" + Environment.NewLine + e.Message);
             }
+        }
 
+        // Initialize a new client
+        private static void StartClient(string ipAddress, int port)
+        {
             try
             {
-                // Start a client
-                Client client = new Client("127.0.0.1", 8008);
+                Client client = new Client(ipAddress, port);
+                clients.Add(client);
+                client.StartClient();
 
                 Logger.Info("Client started");
             }
@@ -36,15 +73,6 @@ namespace PublishSubscribeBroker
             {
                 Logger.Error("Client failed to start" + Environment.NewLine + e.Message);
             }
-
-            // TODO
-        }
-
-        // Initialize a new broker server
-        private static void StartBroker(string ipAddress, int port)
-        {
-            server = new BrokerServer(ipAddress, port);
-            server.StartServer();
         }
     }
 }
