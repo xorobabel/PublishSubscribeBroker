@@ -7,6 +7,8 @@ namespace PublishSubscribeBroker.Networking
     /// <summary>
     /// Sendable message object for a simple message-based communication protocol,<br/>
     /// where the content is pre-serialized and can be formatted for sending over a network
+    /// <br/><br/>
+    /// Serves as a TCP wrapper for sending a serialized object with a length-based data boundary
     /// </summary>
     class SendableMessage<T>
     {
