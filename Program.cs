@@ -1,6 +1,7 @@
 ﻿using PublishSubscribeBroker.Networking;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace PublishSubscribeBroker
@@ -29,6 +30,9 @@ namespace PublishSubscribeBroker
             bool clientStillRunning;
             while (server.IsRunning())
             {
+                Thread.Sleep(1000); // Check every 1 second
+
+                // Check connected status of all active clients
                 clientStillRunning = false;
                 foreach (Client client in clients)
                     if (client.IsConnected())
