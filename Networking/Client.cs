@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 
@@ -8,7 +7,7 @@ namespace PublishSubscribeBroker.Networking
     /// <summary>
     /// Client class that can connect to a server to send and receive messages
     /// </summary>
-    class Client
+    class Client : Communicator
     {
         /// <summary>
         /// The underlying TCP client used to communicate with a server
@@ -51,30 +50,44 @@ namespace PublishSubscribeBroker.Networking
         /// <summary>
         /// Performs the communication behavior of the client while connected to a server
         /// <br/><br/>
-        /// This method can be overridden by a subclass to provide a custom communication protocol
+        /// Acts as a wrapper for the protocol defined in HandleProtocol()
         /// </summary>
         protected virtual void HandleCommunication()
         {
-            // Simple example protocol: Get input from the user and send it immediately to the server
-            // -----
+            // Get the stream used for network communication
             NetworkStream clientStream = client.GetStream();
 
             while (IsConnected())
             {
-                // Get a message from the user to send
-                string input = Console.ReadLine();
-
-                // Check for exit/disconnect command
-                if (String.Equals(input.ToLower(), "exit") || String.Equals(input.ToLower(), "disconnect"))
-                    Disconnect();
-                else
-                {
-                    // Format the message and send it to the server
-                    byte[] message = new SendableMessage<string>(input).Format();
-                    clientStream.Write(message, 0, message.Length);
-                }
+                // Use a separate protocol handler function to provide more granularity and control for subclasses
+                HandleProtocol(clientStream);
             }
-            // -----
+        }
+
+        /// <summary>
+        /// Handles the specific protocol used for communication with the server over the provided network stream
+        /// <br/><br/>
+        /// This method can be overridden by a subclass to provide a custom communication protocol
+        /// </summary>
+        /// <param name="stream">The stream used for communication with the server</param>
+        protected virtual void HandleProtocol(NetworkStream stream)
+        {
+            // Simple example protocol: Get input from the user and send it immediately to the server
+            // ------
+
+            // Get a message from the user to send
+            string input = Console.ReadLine();
+
+            // Check for exit/disconnect command
+            if (string.Equals(input.ToLower(), "exit") || string.Equals(input.ToLower(), "disconnect"))
+                Disconnect();
+            else
+            {
+                // Send the message to the server
+                SendMessage(input, stream);
+
+                Console.WriteLine("[CLIENT] Message sent");
+            }
         }
 
     }

@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.IO;
 using System.Net;
 using System.Net.Sockets;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.Text;
 
 namespace PublishSubscribeBroker.Networking
 {
@@ -23,7 +20,7 @@ namespace PublishSubscribeBroker.Networking
     /// <summary>
     /// Server class that can asynchronously connect with multiple clients to send and receive messages
     /// </summary>
-    class Server
+    class Server : Communicator
     {
         /// <summary>
         /// The TCP listener used by the server for communication
@@ -55,7 +52,7 @@ namespace PublishSubscribeBroker.Networking
         public void StartServer()
         {
             listener.Start();
-            AcceptClient();
+            ListenForClient();
             running = true;
         }
 
@@ -84,18 +81,18 @@ namespace PublishSubscribeBroker.Networking
         /// <summary>
         /// Asynchronously listen for and accept a new client connection
         /// </summary>
-        private void AcceptClient()
+        protected void ListenForClient()
         {
-            listener.BeginAcceptTcpClient(HandleConnection, listener);
+            listener.BeginAcceptTcpClient(AcceptClient, listener);
         }
 
         /// <summary>
-        /// Handle a new client connection
+        /// Accept and handle a new client connection
         /// </summary>
-        private void HandleConnection(IAsyncResult result)
+        protected void AcceptClient(IAsyncResult result)
         {
             // Begin asynchronously listening for another client
-            AcceptClient();
+            ListenForClient();
 
             // Accept the current connection and add it to list of clients
             TcpClient client = listener.EndAcceptTcpClient(result);
@@ -103,15 +100,17 @@ namespace PublishSubscribeBroker.Networking
 
             // Handle communication behavior
             HandleCommunication(clientId);
+
+            // Remove the client when done
             RemoveClient(clientId);
         }
 
         /// <summary>
-        /// Assign the provided client a new ID and add it to the list of clients
+        /// Assign the provided client a new unique ID and add it to the list of clients
         /// </summary>
         /// <param name="newClient">The new client needing to be added</param>
-        /// <returns>The ID (as a Guid) of the newly-added client</returns>
-        private Guid AddClient(TcpClient newClient)
+        /// <returns>The unique ID (as a Guid) of the newly-added client</returns>
+        protected Guid AddClient(TcpClient newClient)
         {
             Guid id = Guid.NewGuid();
             clients[id] = newClient;
@@ -119,59 +118,52 @@ namespace PublishSubscribeBroker.Networking
         }
 
         /// <summary>
-        /// Performs the communication behavior of the server while the client with the specified ID is connected
-        /// <br/><br/>
-        /// This method can be overridden by a subclass to provide a custom communication protocol
-        /// </summary>
-        /// <param name="id">The ID of the connected client</param>
-        protected virtual void HandleCommunication(Guid id)
-        {
-            // Simple example protocol: Print any messages received from the client
-            // -----
-            TcpClient client = clients[id];
-            NetworkStream clientStream = client.GetStream();
-
-            while (client.Connected)
-            {
-                // Extract length-of-message information
-                int lengthBytesRead = 0;
-                byte[] lengthBytes = new byte[4];
-                while (lengthBytesRead < lengthBytes.Length)
-                {
-                    lengthBytesRead += clientStream.Read(lengthBytes, lengthBytesRead, lengthBytes.Length - lengthBytesRead);
-                }
-                int length = BitConverter.ToInt32(lengthBytes, 0);
-
-                // Receive the main message contents
-                int messageBytesRead = 0;
-                byte[] messageBytes = new byte[length];
-                while (messageBytesRead < messageBytes.Length)
-                {
-                    messageBytesRead += clientStream.Read(messageBytes, messageBytesRead, messageBytes.Length - messageBytesRead);
-                }
-
-                // Deserialize the received message object (a string in this protocol)
-                string message;
-                using (MemoryStream messageStream = new MemoryStream(messageBytes))
-                {
-                    message = new BinaryFormatter().Deserialize(messageStream) as string;
-                }
-
-                // Output the received message
-                Console.WriteLine("Message received: {0}", message);
-            }
-        }
-
-        /// <summary>
         /// Remove the client with the specified ID from the list of clients and close the connection to it
         /// </summary>
         /// <param name="id">The ID of the client to remove</param>
-        private void RemoveClient(Guid id)
+        protected void RemoveClient(Guid id)
         {
             TcpClient client;
             bool wasRemoved = clients.TryRemove(id, out client);
             if (wasRemoved)
                 client.Close();
+        }
+
+        /// <summary>
+        /// Performs the communication behavior of the server while the client with the specified ID is connected
+        /// <br/><br/>
+        /// Acts as a wrapper for the protocol defined in HandleProtocol()
+        /// </summary>
+        /// <param name="id">The unique ID of the connected client</param>
+        protected virtual void HandleCommunication(Guid id)
+        {
+            // Get the client with the specified unique ID
+            TcpClient client = clients[id];
+            NetworkStream clientStream = client.GetStream();
+
+            while (client.Connected)
+            {
+                // Use a separate protocol handler function to provide more granularity and control for subclasses
+                HandleProtocol(clientStream);
+            }
+        }
+
+        /// <summary>
+        /// Handles the specific protocol used for communication with the client over the provided network stream
+        /// <br/><br/>
+        /// This method can be overridden by a subclass to provide a custom communication protocol
+        /// </summary>
+        /// <param name="stream">The stream used for communication with the client</param>
+        protected virtual void HandleProtocol(NetworkStream stream)
+        {
+            // Simple example protocol: Print any messages received from the client
+            // ------
+
+            // Get a string message sent by the user
+            string message = ReceiveMessage<string>(stream);
+
+            // Output the received message
+            Console.WriteLine("[SERVER] Message received: {0}", message);
         }
 
     }
