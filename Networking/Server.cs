@@ -6,18 +6,6 @@ using System.Net.Sockets;
 namespace PublishSubscribeBroker.Networking
 {
     /// <summary>
-    /// Extendable data object containing information about a connected client
-    /// </summary>
-    [Serializable]
-    public class ClientInfo
-    {
-        /// <summary>
-        /// The unique internal ID of the client
-        /// </summary>
-        public Guid ID { get; set; }
-    }
-
-    /// <summary>
     /// Server class that can asynchronously connect with multiple clients to send and receive messages
     /// </summary>
     class Server : Communicator
@@ -28,7 +16,7 @@ namespace PublishSubscribeBroker.Networking
         protected TcpListener listener;
 
         /// <summary>
-        /// A thread-safe collection of all clients currently connected to the server, organized by unique ID
+        /// A thread-safe collection of all clients currently connected to the server, organized by the unique ID of each client
         /// </summary>
         protected ConcurrentDictionary<Guid, TcpClient> clients;
 
@@ -98,8 +86,8 @@ namespace PublishSubscribeBroker.Networking
             TcpClient client = listener.EndAcceptTcpClient(result);
             Guid clientId = AddClient(client);
 
-            // Handle communication behavior
-            HandleCommunication(clientId);
+            // Start communicating
+            BeginCommunication(clientId);
 
             // Remove the client when done
             RemoveClient(clientId);
@@ -130,16 +118,19 @@ namespace PublishSubscribeBroker.Networking
         }
 
         /// <summary>
-        /// Performs the communication behavior of the server while the client with the specified ID is connected
+        /// Starts the communication behavior of the server while the client with the specified ID is connected
         /// <br/><br/>
         /// Acts as a wrapper for the protocol defined in HandleProtocol()
         /// </summary>
         /// <param name="id">The unique ID of the connected client</param>
-        protected virtual void HandleCommunication(Guid id)
+        protected virtual void BeginCommunication(Guid id)
         {
             // Get the client with the specified unique ID
             TcpClient client = clients[id];
             NetworkStream clientStream = client.GetStream();
+
+            // Send the client its assigned unique ID
+            SendMessage(id, clientStream);
 
             while (client.Connected)
             {

@@ -15,6 +15,11 @@ namespace PublishSubscribeBroker.Networking
         protected TcpClient client;
 
         /// <summary>
+        /// The unique ID of this client, assigned by the server upon connection
+        /// </summary>
+        public Guid ID { get; set; }
+
+        /// <summary>
         /// Constructor to build a client and connect to the server at the specified address and port
         /// </summary>
         public Client(string ipAddress, int port)
@@ -27,7 +32,7 @@ namespace PublishSubscribeBroker.Networking
         /// </summary>
         public void StartClient()
         {
-            Task.Factory.StartNew(() => HandleCommunication());
+            Task.Factory.StartNew(() => BeginCommunication());
         }
 
         /// <summary>
@@ -48,14 +53,17 @@ namespace PublishSubscribeBroker.Networking
         }
 
         /// <summary>
-        /// Performs the communication behavior of the client while connected to a server
+        /// Starts the communication behavior of the client while connected to a server
         /// <br/><br/>
         /// Acts as a wrapper for the protocol defined in HandleProtocol()
         /// </summary>
-        protected virtual void HandleCommunication()
+        protected virtual void BeginCommunication()
         {
             // Get the stream used for network communication
             NetworkStream clientStream = client.GetStream();
+
+            // Receive the client's assigned unique ID from the server
+            ID = ReceiveMessage<Guid>(clientStream);
 
             while (IsConnected())
             {
