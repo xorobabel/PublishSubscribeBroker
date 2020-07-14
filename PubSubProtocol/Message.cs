@@ -11,7 +11,7 @@ namespace PublishSubscribeBroker
         /// <summary>
         /// The publisher of the message
         /// </summary>
-        public Publisher Publisher { get; set; }
+        public NameIdPair PublisherInfo { get; set; }
 
         /// <summary>
         /// The unique internal ID of the topic the message was published to

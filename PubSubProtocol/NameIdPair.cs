@@ -1,0 +1,21 @@
+﻿using System;
+
+namespace PublishSubscribeBroker
+{
+    /// <summary>
+    /// Simple data object containing a string name and associated unique ID, used for identifying publishers, subscribers, and topics
+    /// </summary>
+    [Serializable]
+    public class NameIdPair
+    {
+        /// <summary>
+        /// The readable name of the associated object
+        /// </summary>
+        public string Name { get; set; }
+
+        /// <summary>
+        /// The unique ID of the associated object
+        /// </summary>
+        public Guid ID { get; set; }
+    }
+}

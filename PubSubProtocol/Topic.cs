@@ -1,33 +1,31 @@
-﻿using System;
+﻿using PublishSubscribeBroker.PubSubProtocol;
+using System;
 using System.Collections.Generic;
 
 namespace PublishSubscribeBroker
 {
     /// <summary>
-    /// Data object containing information about a topic
+    /// Data object containing information about a topic and its subscribers
     /// </summary>
     [Serializable]
     public class Topic
     {
         /// <summary>
-        /// The readable name of the topic
+        /// The name and ID information of the topic
         /// </summary>
-        public string Name { get; set; }
+        public NameIdPair Info { get; set; }
 
         /// <summary>
-        /// The unique internal ID of the topic
+        /// The list of subscribers that are currently subscribed to the topic
         /// </summary>
-        public Guid ID { get; set; }
-    }
+        public List<NameIdPair> Subscribers { get; set; }
 
-    /// <summary>
-    /// Specialized Topic for the broker that also contains information about current subscribers
-    /// </summary>
-    public class BrokerTopic : Topic
-    {
         /// <summary>
-        /// The list of subscribers that are currently subscribed to this topic
+        /// Constructor to initialize a new topic and create its subscriber list
         /// </summary>
-        public List<Subscriber> Subscribers;
+        public Topic()
+        {
+            Subscribers = new List<NameIdPair>();
+        }
     }
 }
