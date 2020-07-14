@@ -1,26 +1,31 @@
 ﻿using System;
+using System.Net.Sockets;
 using PublishSubscribeBroker.Networking;
 
 namespace PublishSubscribeBroker
 {
     /// <summary>
-    /// Data object to hold information about a subscriber
+    /// Specialized client to act as a subscriber in a publish-subscribe system
     /// </summary>
-    [Serializable]
-    public class Subscriber : ClientInfo
-    {
-        /// <summary>
-        /// The readable name of the subscriber
-        /// </summary>
-        public string Name { get; set; }
-    }
-
-    // Specialized client to act as a subscriber in the publish-subscribe pattern
     class SubscriberClient : Client
     {
+        /// <summary>
+        /// The readable name of the subscriber client
+        /// </summary>
+        public string Name { get; set; } = "unnamed";
+
         public SubscriberClient(string ipAddress, int port) : base(ipAddress, port)
         {
+            // TODO
+        }
 
+        /// <summary>
+        /// Override method to handle the publish-subscribe protocol on the subscriber side
+        /// </summary>
+        /// <param name="stream">The network stream used for communication with the server</param>
+        protected override void HandleProtocol(NetworkStream stream)
+        {
+            // TODO
         }
 
         // TOOD
