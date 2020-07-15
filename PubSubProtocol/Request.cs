@@ -26,6 +26,11 @@ namespace PublishSubscribeBroker
     public class SubscribeRequest : Request
     {
         /// <summary>
+        /// The name and ID of the client that wants to subscribe to the topic
+        /// </summary>
+        public NameIdPair Subscriber { get; set; }
+
+        /// <summary>
         /// The ID of the topic to which the client wants to subscribe
         /// </summary>
         public Guid TopicID { get; set; }
@@ -33,10 +38,12 @@ namespace PublishSubscribeBroker
         /// <summary>
         /// Construct a SubscribeRequest for the specified topic
         /// </summary>
+        /// <param name="subscriber">The name and ID of the subscriber client</param>
         /// <param name="topicId">The ID of the topic to subscribe to</param>
-        public SubscribeRequest(Guid topicId)
+        public SubscribeRequest(NameIdPair subscriber, Guid topicId)
         {
             Type = RequestType.SUBSCRIBE;
+            Subscriber = subscriber;
             TopicID = topicId;
         }
     }
@@ -48,6 +55,11 @@ namespace PublishSubscribeBroker
     public class UnsubscribeRequest : Request
     {
         /// <summary>
+        /// The name and ID of the client that wants to unsubscribe from the topic
+        /// </summary>
+        public NameIdPair Subscriber { get; set; }
+
+        /// <summary>
         /// The ID of the topic to which the client wants to unsubscribe
         /// </summary>
         public Guid TopicID { get; set; }
@@ -55,10 +67,12 @@ namespace PublishSubscribeBroker
         /// <summary>
         /// Construct an UnsubscribeRequest for the specified topic
         /// </summary>
+        /// <param name="subscriber">The name and ID of the subscriber client</param>
         /// <param name="topicId">The ID of the topic to unsubscribe from</param>
-        public UnsubscribeRequest(Guid topicId)
+        public UnsubscribeRequest(NameIdPair subscriber, Guid topicId)
         {
             Type = RequestType.UNSUBSCRIBE;
+            Subscriber = subscriber;
             TopicID = topicId;
         }
     }
@@ -71,24 +85,17 @@ namespace PublishSubscribeBroker
     public class PublishRequest<T> : Request
     {
         /// <summary>
-        /// The ID of the topic to which the client wants to publish
-        /// </summary>
-        public Guid TopicID { get; set; }
-
-        /// <summary>
-        /// The message/content that the client wants to publish
+        /// The message/content that the client wants to publish (including publisher, topic, and timestamp info)
         /// </summary>
         public Message<T> Message { get; set; }
 
         /// <summary>
-        /// Construct a PublishRequest for the specified topic and message
+        /// Construct a PublishRequest for the specified message
         /// </summary>
-        /// <param name="topicId">The ID of the topic to publish to</param>
         /// <param name="message">The message to publish</param>
-        public PublishRequest(Guid topicId, Message<T> message)
+        public PublishRequest(Message<T> message)
         {
             Type = RequestType.PUBLISH;
-            TopicID = topicId;
             Message = message;
         }
     }
