@@ -115,5 +115,23 @@ namespace PublishSubscribeBroker
         {
             pendingRequests.Enqueue(request);
         }
+
+        /// <summary>
+        /// Construct a new publish request to publish the provided message to the specified topic
+        /// </summary>
+        /// <param name="topicInfo">The name and unique ID of the topic to publish to</param>
+        /// <param name="messageContent">The content of the message to publish</param>
+        /// <returns>A new publish request to publish the provided message to the specified topic</returns>
+        public PublishRequest<T> MakePublishRequest<T>(NameIdPair topicInfo, T messageContent)
+        {
+            Message<T> message = new Message<T>
+            {
+                Timestamp = DateTime.UtcNow,
+                PublisherInfo = new NameIdPair(Name, ID),
+                TopicInfo = topicInfo,
+                Content = messageContent
+            };
+            return new PublishRequest<T>(message);
+        }
     }
 }

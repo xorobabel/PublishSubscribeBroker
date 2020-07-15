@@ -126,5 +126,25 @@ namespace PublishSubscribeBroker
         {
             pendingRequests.Enqueue(request);
         }
+
+        /// <summary>
+        /// Construct a new subscription request for this subscriber client to subscribe to the topic with the provided ID
+        /// </summary>
+        /// <param name="topicId">The unique ID of the topic to subscribe to</param>
+        /// <returns>A new subscription request for this subscriber client to subscribe to the specified topic</returns>
+        public SubscribeRequest MakeSubscriptionRequest(Guid topicId)
+        {
+            return new SubscribeRequest(new NameIdPair(Name, ID), topicId);
+        }
+
+        /// <summary>
+        /// Construct a new unsubscription request for this subscriber client to unsubscribe from the topic with the provided ID
+        /// </summary>
+        /// <param name="topicId">The unique ID of the topic to unsubscribe from</param>
+        /// <returns>A new unsubscription request for this subscriber client to unsubscribe from the specified topic</returns>
+        public UnsubscribeRequest MakeUnsubscriptionRequest(Guid topicId)
+        {
+            return new UnsubscribeRequest(new NameIdPair(Name, ID), topicId);
+        }
     }
 }
