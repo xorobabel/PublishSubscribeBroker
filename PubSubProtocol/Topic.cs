@@ -22,8 +22,9 @@ namespace PublishSubscribeBroker
         /// <summary>
         /// Constructor to initialize a new topic and create its subscriber list
         /// </summary>
-        public Topic()
+        public Topic(NameIdPair info)
         {
+            Info = info;
             Subscribers = new List<NameIdPair>();
         }
     }

@@ -14,9 +14,9 @@ namespace PublishSubscribeBroker
         public NameIdPair PublisherInfo { get; set; }
 
         /// <summary>
-        /// The unique internal ID of the topic the message was published to
+        /// The name and unique ID of the topic the message was published to
         /// </summary>
-        public Guid TopicID { get; set; }
+        public NameIdPair TopicInfo { get; set; }
 
         /// <summary>
         /// The date and time when the message was published

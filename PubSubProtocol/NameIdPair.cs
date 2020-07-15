@@ -17,5 +17,16 @@ namespace PublishSubscribeBroker
         /// The unique ID of the associated object
         /// </summary>
         public Guid ID { get; set; }
+
+        /// <summary>
+        /// Construct a new NameIdPair with the specified name and unique ID
+        /// </summary>
+        /// <param name="name">The name of the associated object</param>
+        /// <param name="id">The unique ID of the associated object</param>
+        public NameIdPair(string name, Guid id)
+        {
+            Name = name;
+            ID = id;
+        }
     }
 }
