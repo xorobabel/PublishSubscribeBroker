@@ -135,7 +135,7 @@ namespace PublishSubscribeBroker.Networking
             while (client.Connected)
             {
                 // Use a separate protocol handler function to provide more granularity and control for subclasses
-                HandleProtocol(clientStream);
+                HandleProtocol(id, clientStream);
             }
         }
 
@@ -144,8 +144,9 @@ namespace PublishSubscribeBroker.Networking
         /// <br/><br/>
         /// This method can be overridden by a subclass to provide a custom communication protocol
         /// </summary>
+        /// <param name="clientId">The unique ID of the connected client being handled</param>
         /// <param name="stream">The stream used for communication with the client</param>
-        protected virtual void HandleProtocol(NetworkStream stream)
+        protected virtual void HandleProtocol(Guid clientId, NetworkStream stream)
         {
             // Simple example protocol: Print any messages received from the client
             // ------
