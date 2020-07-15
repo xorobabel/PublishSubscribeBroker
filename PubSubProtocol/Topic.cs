@@ -1,12 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Collections.Concurrent;
 
 namespace PublishSubscribeBroker
 {
     /// <summary>
-    /// Data object containing information about a topic and its subscribers
+    /// Data object containing a topic's information and a thread-safe collection of its subscribers
     /// </summary>
-    [Serializable]
     public class Topic
     {
         /// <summary>
@@ -15,9 +14,10 @@ namespace PublishSubscribeBroker
         public NameIdPair Info { get; set; }
 
         /// <summary>
-        /// The list of subscribers that are currently subscribed to the topic
+        /// A thread-safe collection of subscribers that are currently subscribed to the topic, organized by unique ID
         /// </summary>
-        public List<NameIdPair> Subscribers { get; set; }
+        // Note: Unfortunately, the concurrent collections library does not have a thread-safe list implementation
+        public ConcurrentDictionary<Guid, string> Subscribers { get; set; }
 
         /// <summary>
         /// Constructor to initialize a new topic and create its subscriber list
@@ -25,7 +25,7 @@ namespace PublishSubscribeBroker
         public Topic(NameIdPair info)
         {
             Info = info;
-            Subscribers = new List<NameIdPair>();
+            Subscribers = new ConcurrentDictionary<Guid, string>();
         }
     }
 }
