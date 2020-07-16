@@ -37,11 +37,21 @@ namespace PublishSubscribeBroker
         /// <param name="stream">The network stream used for communication with the client</param>
         protected override void HandleProtocol(Guid clientId, NetworkStream stream)
         {
-            // Attempt to receive a request from the client
-            TryReceive(clientId, stream);
+            try
+            {
+                // Attempt to receive a request from the client
+                TryReceive(clientId, stream);
 
-            // Attempt to send a response or new message to the client
-            TrySend(clientId, stream);
+                // Attempt to send a response or new message to the client
+                TrySend(clientId, stream);
+            }
+            catch (Exception e)
+            {
+                // An exception means the client is unexpectedly inaccessible
+                Console.WriteLine("Warning: Connection to a client has been lost unexpectedly");
+                Console.WriteLine("  " + e.Message);
+                RemoveClient(clientId);
+            }
         }
 
         /// <summary>
@@ -155,7 +165,7 @@ namespace PublishSubscribeBroker
         /// <returns>The name and assigned unique ID of the new topic</returns>
         protected NameIdPair CreateTopic(string name)
         {
-            Guid id = new Guid();
+            Guid id = Guid.NewGuid();
             NameIdPair topicInfo = new NameIdPair(name, id);
             topics[id] = new Topic(topicInfo);
             return topicInfo;
