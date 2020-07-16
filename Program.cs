@@ -1,81 +1,59 @@
-﻿using PublishSubscribeBroker.Networking;
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using System;
 
 namespace PublishSubscribeBroker
 {
-
     // Main entry point to start the publish-subscribe broker test application
     class Program
     {
-        private static Server server;           // The active server
-        private static List<Client> clients;    // The active clients
-
         static void Main(string[] args)
         {
-            clients = new List<Client>();
-
             Logger.Info("Starting Publish-Subscribe Broker test application...");
 
-            // Start the server
-            Task serverTask = Task.Factory.StartNew(() => StartServer("127.0.0.1", 8008));
-            serverTask.Wait();
-
-            // Start a client
-            StartClient("localhost", 8008);
-
-            // Wait for the server to shut down or all clients to disconnect
-            bool clientStillRunning;
-            while (server.IsRunning())
-            {
-                Thread.Sleep(1000); // Check every 1 second
-
-                // Check connected status of all active clients
-                clientStillRunning = false;
-                foreach (Client client in clients)
-                    if (client.IsConnected())
-                        clientStillRunning = true;
-
-                if (!clientStillRunning)
-                {
-                    server.StopServer();
-                    Logger.Info("Server stopped because all clients disconnected");
-                }
-            }
+            // TODO
         }
 
         // Initialize a new server
-        private static void StartServer(string ipAddress, int port)
+        private static void StartBrokerServer(string ipAddress, int port)
         {
             try
             {
-                server = new Server(ipAddress, port);
-                server.StartServer();
+                // TODO
 
-                Logger.Info("Server started");
+                Logger.Info("Broker server started");
             }
             catch (Exception e)
             {
-                Logger.Error("Server failed to start" + Environment.NewLine + e.Message);
+                Logger.Error("Broker server failed to start" + Environment.NewLine + e.Message);
             }
         }
 
-        // Initialize a new client
-        private static void StartClient(string ipAddress, int port)
+        // Initialize a new subscriber client
+        private static void StartSubscriberClient(string ipAddress, int port)
         {
             try
             {
-                Client client = new Client(ipAddress, port);
-                clients.Add(client);
-                client.StartClient();
+                // TODO
 
-                Logger.Info("Client started");
+                Logger.Info("Subscriber client started");
             }
             catch (Exception e)
             {
-                Logger.Error("Client failed to start" + Environment.NewLine + e.Message);
+                Logger.Error("Subscriber client failed to start" + Environment.NewLine + e.Message);
+            }
+        }
+
+        // Initialize a new publisher client
+        private static void StartPublisherClient(string ipAddress, int port)
+        {
+            try
+            {
+                // TODO
+
+                Logger.Info("Publisher client started");
+            }
+            catch (Exception e)
+            {
+                Logger.Error("Publisher client failed to start" + Environment.NewLine + e.Message);
             }
         }
     }
