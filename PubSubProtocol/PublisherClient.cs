@@ -44,11 +44,21 @@ namespace PublishSubscribeBroker
         /// <param name="stream">The network stream used for communication with the server</param>
         protected override void HandleProtocol(NetworkStream stream)
         {
-            // Attempt to receive a response from the server
-            TryReceive(stream);
+            try
+            {
+                // Attempt to receive a response from the server
+                TryReceive(stream);
 
-            // Attempt to send a request to the server (if one has been initiated)
-            TrySend(stream);
+                // Attempt to send a request to the server (if one has been initiated)
+                TrySend(stream);
+            }
+            catch (Exception e)
+            {
+                // An exception means the server is unexpectedly inaccessible
+                Console.WriteLine("Error: Connection to the server has been lost unexpectedly");
+                Console.WriteLine("  " + e.Message);
+                Disconnect();
+            }
         }
 
         /// <summary>
@@ -84,7 +94,7 @@ namespace PublishSubscribeBroker
                 else if (response.Type == ResponseType.INFO)
                 {
                     // Show received information response
-                    Console.WriteLine("[Info] ", (response as InfoResponse).Text);
+                    Console.WriteLine("[Info] {0}", (response as InfoResponse).Text);
                 }
                 waitingForResponse = false;
             }

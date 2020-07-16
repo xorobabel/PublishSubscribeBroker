@@ -43,11 +43,21 @@ namespace PublishSubscribeBroker
         /// <param name="stream">The network stream used for communication with the server</param>
         protected override void HandleProtocol(NetworkStream stream)
         {
-            // Attempt to receive a message or response from the server
-            TryReceive(stream);
+            try
+            {
+                // Attempt to receive a message or response from the server
+                TryReceive(stream);
 
-            // Attempt to send a request to the server (if one has been initiated)
-            TrySend(stream);
+                // Attempt to send a request to the server (if one has been initiated)
+                TrySend(stream);
+            }
+            catch (Exception e)
+            {
+                // An exception means the server is unexpectedly inaccessible
+                Console.WriteLine("Error: Connection to the server has been lost unexpectedly");
+                Console.WriteLine("  " + e.Message);
+                Disconnect();
+            }
         }
 
         /// <summary>
@@ -85,17 +95,18 @@ namespace PublishSubscribeBroker
                 {
                     // Cache the topic list and show the list of topics
                     TopicCache = (response as ListTopicsResponse).Topics;
-                    Console.WriteLine("[Topic List]" + Environment.NewLine);
+                    Console.WriteLine("[Topic List]");
                     int index = 0;
                     foreach (NameIdPair topic in TopicCache)
                     {
-                        Console.WriteLine("{0}. {1}" + Environment.NewLine, index, topic.Name);
+                        Console.WriteLine(" {0}. {1}", index, topic.Name);
+                        index++;
                     }
                 }
                 else if (response.Type == ResponseType.INFO)
                 {
                     // Show received information response
-                    Console.WriteLine("[Info] ", (response as InfoResponse).Text);
+                    Console.WriteLine("[Info] {0}", (response as InfoResponse).Text);
                 }
                 waitingForResponse = false;
             }
@@ -145,6 +156,24 @@ namespace PublishSubscribeBroker
         public UnsubscribeRequest MakeUnsubscriptionRequest(Guid topicId)
         {
             return new UnsubscribeRequest(new NameIdPair(Name, ID), topicId);
+        }
+
+        /// <summary>
+        /// Searches for the topic with the specified readable name in the cached topic list and returns its unique ID
+        /// </summary>
+        /// <param name="name">The readable name of the topic to search for</param>
+        /// <returns>The unique ID of the topic with the specified name, or Guid.Empty if it was not found</returns>
+        public Guid FindTopicID(string name)
+        {
+            Guid found = Guid.Empty;
+            int index = 0;
+            while (found == Guid.Empty && index < TopicCache.Count)
+            {
+                if (TopicCache[index].Name == name)
+                    found = TopicCache[index].ID;
+                index++;
+            }
+            return found;
         }
     }
 }
