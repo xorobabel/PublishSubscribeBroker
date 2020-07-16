@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Net.Sockets;
+using System.Threading;
 using PublishSubscribeBroker.Networking;
 
 namespace PublishSubscribeBroker
@@ -50,6 +51,9 @@ namespace PublishSubscribeBroker
 
                 // Attempt to send a request to the server (if one has been initiated)
                 TrySend(stream);
+
+                // Wait a short time to help balance CPU usage
+                Thread.Sleep(20);
             }
             catch (Exception e)
             {
