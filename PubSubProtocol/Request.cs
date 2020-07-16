@@ -125,6 +125,7 @@ namespace PublishSubscribeBroker
     /// <summary>
     /// Specialized request for a topic listing request, where a client requests a list of active topics
     /// </summary>
+    [Serializable]
     public class ListTopicsRequest : Request
     {
         /// <summary>
