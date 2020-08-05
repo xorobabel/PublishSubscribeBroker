@@ -20,7 +20,7 @@ namespace PublishSubscribeBroker
         /// <summary>
         /// The list of topics that the publisher "owns" (has created and can publish to)
         /// </summary>
-        public List<NameIdPair> OwnedTopics { get; private set; }
+        public List<NameIdPair> OwnedTopics { get; private set; } // set is private by default so it can be just { get; }
 
         /// <summary>
         /// A thread-safe queue of pending requests from the user to be sent sequentially to the server
@@ -110,6 +110,7 @@ namespace PublishSubscribeBroker
         /// <param name="stream">The network stream used for communication with the server</param>
         protected void TrySend(NetworkStream stream)
         {
+            // I think these two ifs can be combined as well
             if (!waitingForResponse && pendingRequests.Count > 0)
             {
                 // Send the pending request to the server
@@ -125,10 +126,9 @@ namespace PublishSubscribeBroker
         /// Add a new pending request to send to the server
         /// </summary>
         /// <param name="request">The request object to send</param>
-        public void AddRequest(Request request)
-        {
-            pendingRequests.Enqueue(request);
-        }
+        public void AddRequest(Request request) => pendingRequests.Enqueue(request);
+        // This could also be an expression body. public void AddRequest(Request request) => pendingRequests.Enqueue(request); 
+        // Single liner, very clean imo. But that's just a matter of preference.
 
         /// <summary>
         /// Construct a new publish request to publish the provided message to the specified topic

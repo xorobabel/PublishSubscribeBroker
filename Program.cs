@@ -5,7 +5,7 @@ using System.Threading;
 namespace PublishSubscribeBroker
 {
     // Main entry point to start the publish-subscribe broker test application
-    class Program
+    class Program // It is generally recommended to have explicit access modifiers for classes (private, public, internal, etc.) 
     {
         public const int PORT = 8008;
 
@@ -101,6 +101,7 @@ namespace PublishSubscribeBroker
             return server;
         }
 
+        // Good job using xml comments. These can be used by the IDE for method hinting, so it is helpful to have a param comment for every parameter in the method (ipAddress & port)
         /// <summary>
         /// Initialize a new subscriber client for the specified IP and port to test with
         /// </summary>

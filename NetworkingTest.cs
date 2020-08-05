@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace PublishSubscribeBroker
 {
+    // Good job adding a test class. It can also be useful to learn to write unit tests. In C#, NUnit is a good library for that.
     // Main entry point to start a test of the Networking package (simple message-sending protocol)
     class NetworkingTest
     {

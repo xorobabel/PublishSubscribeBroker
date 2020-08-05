@@ -2,6 +2,8 @@
 
 namespace PublishSubscribeBroker
 {
+    // Good code in these classes
+
     /// <summary>
     /// Enumerator for determining the type/operation of a request
     /// </summary>

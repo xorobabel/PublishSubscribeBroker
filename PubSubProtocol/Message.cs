@@ -6,7 +6,7 @@ namespace PublishSubscribeBroker
     /// Data object containing information for a published message in a pub/sub system
     /// </summary>
     [Serializable]
-    public class Message<T>
+    public class Message<T> // Good class, clean and generic
     {
         /// <summary>
         /// The publisher of the message

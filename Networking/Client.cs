@@ -33,6 +33,9 @@ namespace PublishSubscribeBroker.Networking
         public void StartClient()
         {
             Task.Factory.StartNew(() => BeginCommunication());
+            // I like to use a method group in these instances:
+            // Task.Factory.StartNew(BeginCommunication);
+            // Either way is fine, though.
         }
 
         /// <summary>

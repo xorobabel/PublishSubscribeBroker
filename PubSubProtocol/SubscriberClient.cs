@@ -122,6 +122,7 @@ namespace PublishSubscribeBroker
         /// <param name="stream">The network stream used for communication with the server</param>
         protected void TrySend(NetworkStream stream)
         {
+            // I think you can merge these two ifs into a single if since there is no else
             if (!waitingForResponse && pendingRequests.Count > 0)
             {
                 // Send the pending request to the server
@@ -151,6 +152,10 @@ namespace PublishSubscribeBroker
         {
             return new SubscribeRequest(new NameIdPair(Name, ID), topicId);
         }
+        // In C#, if you have a method that simply returns something, you can use expression bodies. So it would look like this:
+        // public SubscribeRequest MakeSubscriptionRequest(Guid topicId) =>
+        //   new SubscribeRequest(new NameIdPair(Name, ID), topicId);
+        // It's just a matter of preference (not required), but I find it useful since it reduces the amount of code being written and the # of lines.
 
         /// <summary>
         /// Construct a new unsubscription request for this subscriber client to unsubscribe from the topic with the provided ID

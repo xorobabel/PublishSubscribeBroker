@@ -5,6 +5,8 @@ using System.Runtime.Serialization.Formatters.Binary;
 
 namespace PublishSubscribeBroker.Networking
 {
+    // This class is looking good
+
     /// <summary>
     /// Base class for objects that use the network to communicate, providing mechanisms for sending and receiving serialized messages over TCP
     /// </summary>

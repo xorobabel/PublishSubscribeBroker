@@ -210,6 +210,20 @@ namespace PublishSubscribeBroker
             else
                 success = false;
             return success;
+
+            // It looks you don't need the extra bool here, just:
+            if (topics.ContainsKey(message.TopicInfo.ID))
+            {
+                Topic topic = topics[message.TopicInfo.ID];
+
+                // Send the message to the topic's subscribers by adding a response to their individual response queues
+                foreach (Guid subscriberId in topic.Subscribers.Keys)
+                    AddResponse(subscriberId, new NewMessageResponse<T>(message));
+
+                return true;
+            }
+
+            return false;
         }
 
         /// <summary>
@@ -219,6 +233,7 @@ namespace PublishSubscribeBroker
         /// <returns>Whether the client was successfully subscribed to the topic or not</returns>
         protected bool Subscribe(SubscribeRequest request)
         {
+            // Same as I mentioned above
             bool success;
             if (topics.ContainsKey(request.TopicID))
             {
@@ -239,6 +254,7 @@ namespace PublishSubscribeBroker
         /// <returns>Whether the client was successfully unsubscribed from the topic or not</returns>
         protected bool Unsubscribe(UnsubscribeRequest request)
         {
+            // Same as above
             bool success;
             if (topics.ContainsKey(request.TopicID))
             {
